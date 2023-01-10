@@ -1,7 +1,7 @@
 from function import get_image_paths, get_gt_paths, get_merge_path, get_image_bbox, get_gt_param
 import cv2, os
 
-def save_images_txt(save_foler, image_paths, gt_paths):
+def save_crop_images_txt(save_foler, image_paths, gt_paths):
     save_path = get_merge_path([save_foler, "threshold={}".format(str(THRESHOLD))])
     number_of_image = len(image_paths)
 
@@ -10,7 +10,7 @@ def save_images_txt(save_foler, image_paths, gt_paths):
 
         classify, (x1, y1), (x2, y2), image = get_image_bbox(image_path, gt_path)
         shapeX, shapeY, _ = image.shape
-        
+
         ratio = (x2 - x1) * (y2 - y1) / (shapeX * shapeY)
         imageType = "close_images" if ratio >= THRESHOLD else "far_images"
 
@@ -35,4 +35,4 @@ if __name__ == "__main__":
     dataset_folder = "dataset"
     save_foler = "augmentation"
     image_paths, gt_paths = get_image_paths(dataset_folder), get_gt_paths(dataset_folder)
-    save_images_txt(save_foler, image_paths, gt_paths)
+    save_crop_images_txt(save_foler, image_paths, gt_paths)
