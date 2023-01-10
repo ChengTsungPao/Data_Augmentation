@@ -1,6 +1,14 @@
 from function import get_image_paths, get_gt_paths, get_merge_path, get_image_bbox, get_gt_param
 import cv2, os
 
+def get_resize_image_bbox(classify, x1, y1, x2, y2, image):
+    if OUTPUT_SIZE <= 0:
+        return classify, (x1, y1), (x2, y2), image
+    scale = OUTPUT_SIZE / image.shape[0]
+    image = cv2.resize(image, (OUTPUT_SIZE, OUTPUT_SIZE))
+    x1, y1, x2, y2 = int(x1 * scale), int(y1 * scale), int(x2 * scale), int(y2 * scale)
+    return classify, (x1, y1), (x2, y2), image
+
 def save_crop_images_txt(save_foler, image_paths, gt_paths):
     save_path = get_merge_path([save_foler, "threshold={}".format(str(THRESHOLD))])
     number_of_image = len(image_paths)
@@ -9,6 +17,7 @@ def save_crop_images_txt(save_foler, image_paths, gt_paths):
         filename = image_path.split("\\")[-1].split(".jpg")[0]
 
         classify, (x1, y1), (x2, y2), image = get_image_bbox(image_path, gt_path)
+        classify, (x1, y1), (x2, y2), image = get_resize_image_bbox(classify, x1, y1, x2, y2, image)
         shapeX, shapeY, _ = image.shape
 
         ratio = (x2 - x1) * (y2 - y1) / (shapeX * shapeY)
@@ -30,7 +39,8 @@ def save_crop_images_txt(save_foler, image_paths, gt_paths):
 
 if __name__ == "__main__":
     THRESHOLD = 0.02
-    SAVE_IMAGE_TYPE = "OriginCrop"
+    OUTPUT_SIZE = -1
+    SAVE_IMAGE_TYPE = "OriginCrop1"
 
     dataset_folder = "dataset"
     save_foler = "augmentation"
