@@ -1,4 +1,4 @@
 ## Data Augmentation
 
-✅ classify far & close image <br>
-✅ difference image size <br>
+✅ classify far image & close image <br>
+✅ image size transfer to square size <br>
