@@ -48,9 +48,6 @@ def save_aug_images_and_txt(save_path, image_paths, gt_paths):
         filename = image_path.split("\\")[-1].split(".jpg")[0]
 
         classify, (x1, y1), (x2, y2), image = get_aug_image_bbox(image_path, gt_path)
-
-        classify, (x1, y1), (x2, y2), (shapeX, shapeY), image = get_image_bbox(image_path, gt_path)
-        x1, y1, x2, y2, image = flip_or_rotated(x1, y1, x2, y2, image)
         shapeX, shapeY, _ = image.shape
 
         save_images_path = get_merge_path([save_path, "images"])
