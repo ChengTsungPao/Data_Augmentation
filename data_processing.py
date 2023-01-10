@@ -65,9 +65,9 @@ def save_images_txt(save_foler, image_paths, gt_paths):
         ratio = (x2 - x1) * (y2 - y1) / (shapeX * shapeY)
         imageType = "close_images" if ratio >= THRESHOLD else "far_images"
 
-        save_images_path = get_merge_path([save_path, imageType, "OriginCrop", "images"])
-        save_labels_path = get_merge_path([save_path, imageType, "OriginCrop", "labels"])
-        save_bboxImages_path = get_merge_path([save_path, imageType, "OriginCrop", "bbox"])
+        save_images_path = get_merge_path([save_path, imageType, SAVE_IMAGE_TYPE, "images"])
+        save_labels_path = get_merge_path([save_path, imageType, SAVE_IMAGE_TYPE, "labels"])
+        save_bboxImages_path = get_merge_path([save_path, imageType, SAVE_IMAGE_TYPE, "bbox"])
 
         cv2.imwrite(os.path.join(save_images_path, "{}.jpg".format(filename)), image)
 
@@ -89,6 +89,8 @@ def show_image(image, scale = 8):
 
 if __name__ == "__main__":
     THRESHOLD = 0.02
+    SAVE_IMAGE_TYPE = "OriginCrop"
+
     dataset_folder = "dataset"
     save_foler = "augmentation"
     image_paths, gt_paths = get_image_paths(dataset_folder), get_gt_paths(dataset_folder)
