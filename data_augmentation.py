@@ -69,7 +69,7 @@ if __name__ == "__main__":
     SAVE_IMAGE_TYPE = "CropAug"
     IMAGETYPE = "close_images" # "far_images"
 
-    crop_path = get_merge_path(["augmentation", "threshold={}".format(str(THRESHOLD)), IMAGETYPE, "OriginCrop"])
-    save_path = get_merge_path(["augmentation", "threshold={}".format(str(THRESHOLD)), IMAGETYPE, "CropAug"])
+    crop_path = get_merge_path(["augmentation", f"threshold={THRESHOLD}", IMAGETYPE, "OriginCrop"])
+    save_path = get_merge_path(["augmentation", f"threshold={THRESHOLD}", IMAGETYPE, "CropAug"])
     image_paths, gt_paths = get_image_paths(crop_path), get_gt_paths(crop_path)
     save_aug_images_and_txt(save_path, image_paths, gt_paths)
