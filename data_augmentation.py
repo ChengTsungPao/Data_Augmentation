@@ -1,4 +1,4 @@
-from data_processing import get_image_paths, get_gt_paths, get_merge_path, get_image_bbox, get_gt_param
+from function import get_image_paths, get_gt_paths, get_merge_path, get_image_bbox, get_gt_param
 import numpy as np
 import cv2, os
 
@@ -38,32 +38,34 @@ def flip_or_rotated(x1, y1, x2, y2, image):
 
     return x1, y1, x2, y2, image
 
-def get_aug_images_bboxes(save_path, image_paths, gt_paths):
+def get_aug_image_bbox(image_path, gt_path):
+    classify, (x1, y1), (x2, y2), image = get_image_bbox(image_path, gt_path)
+    x1, y1, x2, y2, image = flip_or_rotated(x1, y1, x2, y2, image)
+    return classify, (x1, y1), (x2, y2), image
+
+def save_aug_images_and_txt(save_path, image_paths, gt_paths):
     for i, (image_path, gt_path) in enumerate(zip(image_paths, gt_paths)):
         filename = image_path.split("\\")[-1].split(".jpg")[0]
 
+        classify, (x1, y1), (x2, y2), image = get_aug_image_bbox(image_path, gt_path)
+
         classify, (x1, y1), (x2, y2), (shapeX, shapeY), image = get_image_bbox(image_path, gt_path)
         x1, y1, x2, y2, image = flip_or_rotated(x1, y1, x2, y2, image)
-        save_param = [classify, (x1, y1), (x2, y2), image]
+        shapeX, shapeY, _ = image.shape
 
-        save_images_and_txt(save_path, filename, save_param)
+        save_images_path = get_merge_path([save_path, "images"])
+        save_labels_path = get_merge_path([save_path, "labels"])
+        save_bboxImages_path = get_merge_path([save_path, "bbox"])
+
+        cv2.imwrite(os.path.join(save_images_path, "{}.jpg".format(filename)), image)
+
+        classify, x1_ratio, y1_ratio, w_ratio, h_ratio = get_gt_param(classify, x1, y1, x2, y2, shapeX, shapeY)
+        open(os.path.join(save_labels_path, "{}.txt".format(filename)), "w").write("{} {} {} {} {}".format(classify, x1_ratio, y1_ratio, w_ratio, h_ratio))
+
+        cv2.rectangle(image, (y1, x1), (y2, x2), (0, 255, 0), 5, cv2.LINE_AA)
+        cv2.imwrite(os.path.join(save_bboxImages_path, "{}.jpg".format(filename)), image)
+
         print("\r", save_path + ": %.4f" % (((i + 1) / len(image_paths)) * 100.), "%", end=" ")
-
-def save_images_and_txt(save_path, filename, save_param):
-    classify, (x1, y1), (x2, y2), image = save_param
-    shapeX, shapeY, _ = image.shape
-
-    save_images_path = get_merge_path([save_path, "images"])
-    save_labels_path = get_merge_path([save_path, "labels"])
-    save_bboxImages_path = get_merge_path([save_path, "bbox"])
-
-    cv2.imwrite(os.path.join(save_images_path, "{}.jpg".format(filename)), image)
-
-    classify, x1_ratio, y1_ratio, w_ratio, h_ratio = get_gt_param(classify, x1, y1, x2, y2, shapeX, shapeY)
-    open(os.path.join(save_labels_path, "{}.txt".format(filename)), "w").write("{} {} {} {} {}".format(classify, x1_ratio, y1_ratio, w_ratio, h_ratio))
-
-    cv2.rectangle(image, (y1, x1), (y2, x2), (0, 255, 0), 5, cv2.LINE_AA)
-    cv2.imwrite(os.path.join(save_bboxImages_path, "{}.jpg".format(filename)), image)
 
 if __name__ == "__main__":
     THRESHOLD = 0.02
@@ -73,4 +75,4 @@ if __name__ == "__main__":
     crop_path = get_merge_path(["augmentation", "threshold={}".format(str(THRESHOLD)), IMAGETYPE, "OriginCrop"])
     save_path = get_merge_path(["augmentation", "threshold={}".format(str(THRESHOLD)), IMAGETYPE, "CropAug"])
     image_paths, gt_paths = get_image_paths(crop_path), get_gt_paths(crop_path)
-    get_aug_images_bboxes(save_path, image_paths, gt_paths)
+    save_aug_images_and_txt(save_path, image_paths, gt_paths)
