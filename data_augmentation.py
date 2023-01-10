@@ -4,7 +4,7 @@ import cv2, os
 
 def flip_or_rotated(x1, y1, x2, y2, image):
     shapeX, shapeY, _ = image.shape
-    random_kind = 1#np.random.randint(0, 5 + 1)
+    random_kind = np.random.randint(0, 5 + 1)
 
     if random_kind == 1:
         image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
