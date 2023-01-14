@@ -2,23 +2,19 @@ from function import get_image_paths, get_gt_paths, get_merge_path, get_image_bb
 import numpy as np
 import cv2, os
 
-def flip_or_rotated(x1, y1, x2, y2, image):
+def flip_or_rotated(x1, y1, x2, y2, image, augType = -1):
     shapeX, shapeY, _ = image.shape
-    random_kind = np.random.randint(0, 5 + 1)
+    random_kind = augType if augType >= 0 else np.random.randint(0, 5 + 1)
 
     if random_kind == 1:
-        image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+        image = cv2.flip(image, 0)
 
         x1, x2 = shapeX - x1, shapeX- x2
-        x1, y1 = y1, x1
-        x2, y2 = y2, x2
 
     elif random_kind == 2:
-        image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        image = cv2.flip(image, 1)
 
         y1, y2 = shapeY - y1, shapeY- y2
-        x1, y1 = y1, x1
-        x2, y2 = y2, x2
 
     elif random_kind == 3:
         image = cv2.rotate(image, cv2.ROTATE_180)
@@ -27,46 +23,52 @@ def flip_or_rotated(x1, y1, x2, y2, image):
         y1, y2 = shapeY - y1, shapeY- y2
 
     elif random_kind == 4:
-        image = cv2.flip(image, 0)
+        image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
 
         x1, x2 = shapeX - x1, shapeX- x2
+        x1, y1 = y1, x1
+        x2, y2 = y2, x2
 
     elif random_kind == 5:
-        image = cv2.flip(image, 1)
+        image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
         y1, y2 = shapeY - y1, shapeY- y2
+        x1, y1 = y1, x1
+        x2, y2 = y2, x2
 
     return x1, y1, x2, y2, image
 
-def get_aug_image_bbox(image_path, gt_path):
+def get_aug_image_bbox(image_path, gt_path, augType = -1):
     classify, (x1, y1), (x2, y2), image = get_image_bbox(image_path, gt_path)
-    x1, y1, x2, y2, image = flip_or_rotated(x1, y1, x2, y2, image)
+    x1, y1, x2, y2, image = flip_or_rotated(x1, y1, x2, y2, image, augType)
     return classify, (x1, y1), (x2, y2), image
 
 def save_aug_images_and_txt(save_path, image_paths, gt_paths):
     for i, (image_path, gt_path) in enumerate(zip(image_paths, gt_paths)):
         filename = image_path.split("\\")[-1].split(".jpg")[0]
 
-        classify, (x1, y1), (x2, y2), image = get_aug_image_bbox(image_path, gt_path)
-        shapeX, shapeY, _ = image.shape
+        for augType in range(3 + 1):
 
-        save_images_path = get_merge_path([save_path, "images"])
-        save_labels_path = get_merge_path([save_path, "labels"])
-        save_bboxImages_path = get_merge_path([save_path, "bbox"])
+            classify, (x1, y1), (x2, y2), image = get_aug_image_bbox(image_path, gt_path, augType)
+            shapeX, shapeY, _ = image.shape
 
-        cv2.imwrite(os.path.join(save_images_path, "{}.jpg".format(filename)), image)
+            save_images_path = get_merge_path([save_path, "images"])
+            save_labels_path = get_merge_path([save_path, "labels"])
+            save_bboxImages_path = get_merge_path([save_path, "bbox"])
 
-        classify, x1_ratio, y1_ratio, w_ratio, h_ratio = get_gt_param(classify, x1, y1, x2, y2, shapeX, shapeY)
-        open(os.path.join(save_labels_path, "{}.txt".format(filename)), "w").write("{} {} {} {} {}".format(classify, x1_ratio, y1_ratio, w_ratio, h_ratio))
+            cv2.imwrite(os.path.join(save_images_path, "{}_{}.jpg".format(filename, augType)), image)
 
-        cv2.rectangle(image, (y1, x1), (y2, x2), (0, 255, 0), 5, cv2.LINE_AA)
-        cv2.imwrite(os.path.join(save_bboxImages_path, "{}.jpg".format(filename)), image)
+            classify, x1_ratio, y1_ratio, w_ratio, h_ratio = get_gt_param(classify, x1, y1, x2, y2, shapeX, shapeY)
+            open(os.path.join(save_labels_path, "{}_{}.txt".format(filename, augType)), "w").write("{} {} {} {} {}".format(classify, x1_ratio, y1_ratio, w_ratio, h_ratio))
 
-        print("\r", save_path + ": %.4f" % (((i + 1) / len(image_paths)) * 100.), "%", end=" ")
+            cv2.rectangle(image, (y1, x1), (y2, x2), (0, 255, 0), 5, cv2.LINE_AA)
+            cv2.imwrite(os.path.join(save_bboxImages_path, "{}_{}.jpg".format(filename, augType)), image)
+
+            print("\r", save_path + ": %.4f" % (((i + 1) / len(image_paths)) * 100.), "%", end=" ")
 
 if __name__ == "__main__":
     THRESHOLD = 0.02
-    OUTPUT_SIZE = -1
+    OUTPUT_SIZE = 512
     SAVE_IMAGE_TYPE = "CropAug"
     IMAGETYPE = "close_images" # "far_images"
 

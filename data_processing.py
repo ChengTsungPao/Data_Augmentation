@@ -13,7 +13,8 @@ def save_crop_images_txt(save_path, image_paths, gt_paths):
     number_of_image = len(image_paths)
 
     for i, (image_path, gt_path) in enumerate(zip(image_paths, gt_paths)):
-        filename = image_path.split("\\")[-1].split(".jpg")[0]
+        # filename = image_path.split("\\")[-1].split(".jpg")[0]
+        filename = str(i).zfill(4)
 
         classify, (x1, y1), (x2, y2), image = get_image_bbox(image_path, gt_path)
         classify, (x1, y1), (x2, y2), image = get_resize_image_bbox(classify, x1, y1, x2, y2, image)
@@ -38,7 +39,7 @@ def save_crop_images_txt(save_path, image_paths, gt_paths):
 
 if __name__ == "__main__":
     THRESHOLD = 0.02
-    OUTPUT_SIZE = -1
+    OUTPUT_SIZE = 512
     SAVE_IMAGE_TYPE = "OriginCrop"
 
     dataset_path = "dataset"
