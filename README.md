@@ -13,8 +13,8 @@
 		* setup [THRESHOLD, OUTPUT_SIZE, SAVE_IMAGE_TYPE] = [0.02, 512, "OriginCrop"]
 	* After running .py
 		* save .jpg and .txt in "./augmentation/threshold=0.02-output_size=512/close_images/OriginCrop"
-		* save .jpg and .txt in "./augmentation/threshold=0.02-output_size=512/far_images/OriginCrop"
- <br>
+		* save .jpg and .txt in "./augmentation/threshold=0.02-output_size=512/far_images/OriginCrop" <br>
+
 * Run data_augmentation.py (Second)
 	* Before running .py
 		* setup [THRESHOLD, OUTPUT_SIZE, SAVE_IMAGE_TYPE, IMAGETYPE] = [0.02, 512, "CropAug", "close_images" or "far_images"]
