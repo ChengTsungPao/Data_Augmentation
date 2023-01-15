@@ -8,8 +8,8 @@
 ### How to use ?
 
 * Step1: Prepare Dataset
-    * "./dataset/images"
-    * "./dataset/labels" <br>
+    * All .jpg in "./dataset/images"
+    * All .txt in "./dataset/labels" <br>
 
 * Step2: Run data_processing.py
 	* Before running .py
