@@ -41,6 +41,7 @@ def flip_or_rotated(x1, y1, x2, y2, image, augType = -1):
 def get_aug_image_bbox(image_path, gt_path, augType = -1):
     classify, (x1, y1), (x2, y2), image = get_image_bbox(image_path, gt_path)
     x1, y1, x2, y2, image = flip_or_rotated(x1, y1, x2, y2, image, augType)
+    (x1, y1), (x2, y2) = (min(x1, x2), min(y1, y2)), (max(x1, x2), max(y1, y2))
     return classify, (x1, y1), (x2, y2), image
 
 def save_aug_images_and_txt(save_path, image_paths, gt_paths):
