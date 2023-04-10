@@ -20,11 +20,11 @@
 
 * Step3: Run data_augmentation.py
 	* Before running .py
-		* setup [THRESHOLD, OUTPUT_SIZE, SAVE_IMAGE_TYPE, IMAGETYPE] = [0.02, 512, "CropAug"]
+		* setup [THRESHOLD, OUTPUT_SIZE, SAVE_IMAGE_TYPE, IMAGETYPE, RATIO] = [0.02, 512, "CropAug", [0.8, 0.1, 0.1]]
         * setup [IMAGETYPE] = ["close_images" or "far_images"]
 	* After running .py
-		* save .jpg and .txt in "./augmentation/threshold=0.02-output_size=512/close_images/CropAug"
-		* save .jpg and .txt in "./augmentation/threshold=0.02-output_size=512/far_images/CropAug" <br>
+		* save .jpg and .txt in "./augmentation/threshold=0.02-output_size=512/close_images/CropAug" (train、val、test)
+		* save .jpg and .txt in "./augmentation/threshold=0.02-output_size=512/far_images/CropAug" (train、val、test)<br>
 
 ### Note
 * **THRESHOLD**: use "THRESHOLD" (bbox area / image area) to classify "close_images" or "far_images"
