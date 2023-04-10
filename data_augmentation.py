@@ -72,8 +72,26 @@ if __name__ == "__main__":
     OUTPUT_SIZE = 512
     SAVE_IMAGE_TYPE = "CropAug"
     IMAGETYPE = "close_images" # "far_images"
+    RATIO = [0.8, 0.1, 0.1]
 
     crop_path = get_merge_path(["augmentation", f"threshold={THRESHOLD}-output_size={OUTPUT_SIZE}", IMAGETYPE, "OriginCrop"])
-    save_path = get_merge_path(["augmentation", f"threshold={THRESHOLD}-output_size={OUTPUT_SIZE}", IMAGETYPE, "CropAug"])
     image_paths, gt_paths = get_image_paths(crop_path), get_gt_paths(crop_path)
-    save_aug_images_and_txt(save_path, image_paths, gt_paths)
+    number_of_data = len(image_paths)
+
+    # train dataset
+    i, j = np.array([number_of_data * sum(RATIO[:0]), number_of_data * sum(RATIO[:1])], int)
+    save_path = get_merge_path(["augmentation", f"threshold={THRESHOLD}-output_size={OUTPUT_SIZE}", IMAGETYPE, "CropAug", "train"])
+    save_aug_images_and_txt(save_path, image_paths[i : j], gt_paths[i : j])
+    print("\n===== train dataset augmentation finish =====")
+
+    # val dataset
+    i, j = np.array([number_of_data * sum(RATIO[:1]), number_of_data * sum(RATIO[:2])], int)
+    save_path = get_merge_path(["augmentation", f"threshold={THRESHOLD}-output_size={OUTPUT_SIZE}", IMAGETYPE, "CropAug", "val"])
+    save_aug_images_and_txt(save_path, image_paths[i : j], gt_paths[i : j])
+    print("\n===== val dataset augmentation finish =====")
+
+    # test dataset
+    i, j = np.array([number_of_data * sum(RATIO[:2]), number_of_data * sum(RATIO[:3])], int)
+    save_path = get_merge_path(["augmentation", f"threshold={THRESHOLD}-output_size={OUTPUT_SIZE}", IMAGETYPE, "CropAug", "test"])
+    save_aug_images_and_txt(save_path, image_paths[i : j], gt_paths[i : j])
+    print("\n===== test dataset augmentation finish =====")
